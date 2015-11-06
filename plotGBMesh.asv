@@ -1,0 +1,59 @@
+function plotGBMesh(finMatFname,bodyMatFname,varargin)
+%% plotGBMesh Plots GB Body Mesh in 3D
+%
+% Simple usage:
+%
+% plotGBMesh('GB-Mesh-Fine-Corrected.mat','GB-v1.vertex');
+% 
+% Input:
+%
+% finMatFname  - Name of the input .mat file
+% bodyMatFname - Name of the input .mat file
+% (optional) 'SaveFileName' - Name of the target file to save
+% 
+% Output:
+%
+%
+%
+% written by Chen Chen 11-3-2015
+%
+
+%% Load .mat file
+Fin = load(finMatFname);
+Body = load(bodyMatFname);
+
+%% Handle input
+saveMatFname = [];
+for i = 1:2:nargin-1
+    switch varargin{i}
+        case 'SaveFileName'
+            saveMatFname = varargin{i+1};
+    end
+end
+
+% Check saveMatFname
+if isempty(strfind(saveMatFname,'.mat'))
+    saveMatFname = 'GB-Mesh.mat'; % default
+end
+
+%% Correct Fin Offset
+finOffect = 81.1183;
+tmpFinStartPoint = Body.Res.rangeZ(2) - finOffect;
+tmpOffset = tmpFinStartPoint - Fin.Res.rangeZ(2);
+Fin.Res.rangeZ = Fin.Res.rangeZ + tmpOffset;
+
+for i = 1:numel(Fin.MeshVertAll)
+    Fin.MeshVertAll{i}(:,3) = Fin.MeshVertAll{i}(:,3) + tmpOffset;
+end
+
+save('GB-Mesh-Fine.mat')
+clear tmpOffset tmpFinStartPoint
+
+%% Plot
+% A Plot Vertices
+
+for i = 1:numel(Body.MeshVertAll)
+    % Body Verts
+end
+figure(1);
+plot3();
